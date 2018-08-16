@@ -10,17 +10,8 @@ function Spectrum(canvas){
     this.canvas.height = window.innerHeight;
 }
 
-Spectrum.prototype.listen = function (audioContext, audioSrc) {
-    // 创建媒体源,除了audio本身可以获取，也可以通过oCtx对象提供的api进行媒体源操作
-    // this.audioSrc = audioContext.createMediaElementSource(stream);
-    this.audioSrc = audioSrc;
-    // 创建分析机
-    this.analyser = audioContext.createAnalyser();
-    // 媒体源与分析机连接
-    this.audioSrc.connect(this.analyser);
-
-    // 输出的目标：将分析机分析出来的处理结果与目标点（耳机/扬声器）连接
-    this.analyser.connect(audioContext.destination);
+Spectrum.prototype.listen = function (analyser) {
+    this.analyser = analyser;
 };
 
 Spectrum.prototype.style1 = function () {
@@ -52,11 +43,40 @@ Spectrum.prototype.style1 = function () {
         for (var i = 0; i < count; i++) {
             var audioHeight = voiceHeight[step * i] * 1.5;
             that.ctx.fillStyle = color1;  // 绘制向上的线条
-            that.ctx.fillRect(oW / 2 + (i * 10), oH / 2, 7, -audioHeight);
-            that.ctx.fillRect(oW / 2 - (i * 10), oH / 2, 7, -audioHeight);
+            that.ctx.fillRect(oW / 2 + (i * 10), oH / 2, 7, -audioHeight);//右上
+            that.ctx.fillRect(oW / 2 - (i * 10), oH / 2, 7, -audioHeight);//左上
             that.ctx.fillStyle = color2;  // 绘制向下的线条
-            that.ctx.fillRect(oW / 2 + (i * 10), oH / 2, 7, audioHeight);
-            that.ctx.fillRect(oW / 2 - (i * 10), oH / 2, 7, audioHeight);
+            that.ctx.fillRect(oW / 2 + (i * 10), oH / 2, 7, audioHeight);//右下
+            that.ctx.fillRect(oW / 2 - (i * 10), oH / 2, 7, audioHeight);//左下
+        }
+        window.requestAnimationFrame(draw);
+    }
+    draw();
+};
+
+
+Spectrum.prototype.style2 = function () {
+    var that = this;
+    var oW = that.canvas.width;
+    var oH = that.canvas.height;
+
+    var gradient = that.ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(1, '#0f0');
+    gradient.addColorStop(0.5, '#ff0');
+    gradient.addColorStop(0, '#f00');
+    function draw() {
+        // 缓冲区:进行数据的缓冲处理，转换成二进制数据
+        var voiceHeight = new Uint8Array(that.analyser.frequencyBinCount);
+
+        // 将当前的频率数据复制到传入的无符号字节数组中，做到实时连接
+        that.analyser.getByteFrequencyData(voiceHeight);
+        console.log(voiceHeight.length, oW, oH);
+        that.ctx.clearRect(0, 0, oW, oH);
+        for (var i = 0; i < voiceHeight.length; i++) {
+            var audioHeight = voiceHeight[i];
+            that.ctx.fillStyle = gradient; //set the filllStyle to gradient for a better look
+            //context.fillRect(x,y,width,height);
+            that.ctx.fillRect(oW/voiceHeight.length * i + 12, oH - audioHeight, 10, audioHeight); //the meter
         }
         window.requestAnimationFrame(draw);
     }

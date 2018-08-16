@@ -1,29 +1,48 @@
 function start() {
     document.removeEventListener('click', start);
     document.removeEventListener('touchend', start);
-    var context = new (window.AudioContext || window.webkitAudioContext)();
+
+    //AudioContext接口表示由音频模块连接而成的音频处理图，每个模块对应一个AudioNode。
+    //AudioContext可以控制它所包含的节点的创建，以及音频处理、解码操作的执行。
+    var AudioContext = window.AudioContext || window.webkitAudioContext;
+    var audioContext = new AudioContext();
+
+    // 媒体源
     var mediaElement = document.querySelector('audio');
-    var source = context.createMediaElementSource(mediaElement);
+    //创建媒体源,除了audio本身可以获取，也可以通过audioContext对象提供的api进行媒体源操作
+    var source = audioContext.createMediaElementSource(mediaElement);
+
+    // 创建分析机
+    var analyser = audioContext.createAnalyser();
+    // 媒体源与分析机连接
+    source.connect(analyser);
+    // 输出的目标：将分析机分析出来的处理结果与目标点（耳机/扬声器）连接
+    analyser.connect(audioContext.destination);
+
     //频谱
     var spectrum = new Spectrum(document.querySelector('#canvas'));
-    spectrum.listen(context, source);
+    spectrum.listen(analyser);
     spectrum.style1();
 
-    var highShelf = context.createBiquadFilter();
-    var lowShelf = context.createBiquadFilter();
-    var highPass = context.createBiquadFilter();
-    var lowPass = context.createBiquadFilter();
+    // 创建一个BiquadFilterNode，它代表一个双二阶滤波器，
+    // 可以设置几种不同且常见滤波器类型：高通、低通、带通等。
+    var highShelf = audioContext.createBiquadFilter();
+    var lowShelf = audioContext.createBiquadFilter();
+    var highPass = audioContext.createBiquadFilter();
+    var lowPass = audioContext.createBiquadFilter();
     let controlSet = {
         highShelf,
         lowShelf,
         highPass,
         lowPass
     };
+
     source.connect(highShelf);
     highShelf.connect(lowShelf);
     lowShelf.connect(highPass);
     highPass.connect(lowPass);
-    lowPass.connect(context.destination);
+    //audioContext.destination, 表示当前audio context中所有节点的最终节点，一般表示音频渲染设备。
+    lowPass.connect(audioContext.destination);
 
     highShelf.type = "highshelf";
     highShelf.frequency.value = 4700;
