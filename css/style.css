@@ -1,0 +1,32 @@
+.row{
+    z-index: 10;
+}
+.audio-list{
+    width: 448px;
+    margin-bottom: 10px;
+}
+
+.audio-btn{
+    color: #666;
+    background-color: #EEE;
+    border-color: #EEE;
+    font-size: 16px;
+    letter-spacing: 2px;
+    text-decoration: none;
+    text-align: center;
+    line-height: 40px;
+    height: 40px;
+    padding: 0 20px;
+    margin: 0;
+    display: inline-block;
+    appearance: none;
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.07);
+}
+.audio-btn, .audio-btn:visited {
+    color: #44BFA3;
+    background-color: rgba(0, 0, 0, 0.62);
+    background-color: rgba(0, 0, 0, 0.62);
+}
