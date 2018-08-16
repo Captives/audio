@@ -50,7 +50,7 @@ Spectrum.prototype.style1 = function () {
         var step = Math.round(voiceHeight.length / count);
         that.ctx.clearRect(0, 0, oW, oH);
         for (var i = 0; i < count; i++) {
-            var audioHeight = voiceHeight[step * i];
+            var audioHeight = voiceHeight[step * i] * 1.5;
             that.ctx.fillStyle = color1;  // 绘制向上的线条
             that.ctx.fillRect(oW / 2 + (i * 10), oH / 2, 7, -audioHeight);
             that.ctx.fillRect(oW / 2 - (i * 10), oH / 2, 7, -audioHeight);
