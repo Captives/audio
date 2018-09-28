@@ -256,9 +256,9 @@ function directionAware() {
 var list = document.querySelectorAll('.audio-btn') || [];
 list.forEach(function (item) {
     item.onclick = function (event) {
-        console.log(event.target.dataset.value);
+        console.log(event.target.dataset.value || document.querySelector('input.audio').value);
         var audio  = document.querySelector('audio');
-        audio.src = event.target.dataset.value;
+        audio.src = event.target.dataset.value || document.querySelector('input.audio').value;
         audio.autoplay = true;
         audio.onplay = function (e) {
             audio.play();
